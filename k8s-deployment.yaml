@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gomaxprocs-k8s
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gomaxprocs-k8s
+  template:
+    metadata:
+      labels:
+        app: gomaxprocs-k8s
+    spec:
+      containers:
+      - name: gomaxprocs-k8s
+        image: docker.io/library/gomaxprocs-k8s:1.0
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: "1250m"
+          requests:
+            cpu: "1250m"
+        env:
+          - name: GOMAXPROCS
+            value: "2"
+          - name: NUM_GOROUTINES
+            value: "10"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gomaxprocs-k8s
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30080
+  selector:
+    app: gomaxprocs-k8s 
